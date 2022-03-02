@@ -10,10 +10,11 @@ class State{
 
     public static List<State> allStates = new ArrayList<>();
 
-    public State(String ime){
+    public State(String name) {
         this.name = name;
         transitions = new HashMap<String, List<State>>();
     }
+
     public String getName(){
         return name;
     }
@@ -25,8 +26,8 @@ class State{
     public static State getStateByName(String name){
       // return allStates.stream().filter((s) -> { return name == s.getName();}).findAny().get();
 
-       for(State s : allStates){
-            if(s.getName() == name){
+       for(State s : State.allStates){
+            if(s.getName().equals(name)){
                 return s;
             }
         }
@@ -42,6 +43,7 @@ public class lab1 {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         List<State> goodStates = new ArrayList<>();
+        List<State> allStates = new ArrayList<>();
         State beginState = null;
         //String string = new String(Files.readAllBytes(Path.of("rjesenja.txt")));
 
@@ -66,7 +68,6 @@ public class lab1 {
 
                 str = s.split(",");
                 for (String el : str) {
-
                     State.allStates.add(new State(el));
                 }
 
@@ -80,27 +81,16 @@ public class lab1 {
 
                 s = reader.readLine(); //poželjna stanja
                 for(String el: s.split(",")){
-                    goodStates.add(State.getStateByName(el));
+                    if(State.getStateByName(el) != null){
+                        goodStates.add(State.getStateByName(el));
+                    }
+
                 }
 
                 s = reader.readLine();
                 beginState = State.getStateByName(s);
 
-                //provjera
-            System.out.println("Provjera: ");
-                for(State sat: State.allStates){
-                    System.out.println(sat.getName());
-                }
-
-            System.out.println("Provjera abeceda: ");
-                for(String st: abeceda){
-                    System.out.print(st + " ");
-                }
-
-                for(State st: goodStates){
-                    System.out.print(st.getName() + " ");
-                }
-            System.out.println(beginState.getName());
+                
             }
         }
     }
