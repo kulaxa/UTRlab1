@@ -47,7 +47,20 @@ class State{
        return null;
     }
 
-        public void printAllNextStates(){
+    public void CheckForEmptyKey(List<State> result){
+         CheckForEmptyKeyRec(this, result);
+    }
+
+    private void CheckForEmptyKeyRec(State state, List<State> result) {
+        if(state.getNextStates("$") ==null )return;
+        result.addAll(state.getNextStates("$"));
+        for(State s: state.getNextStates("$")){
+            CheckForEmptyKeyRec(s, result);
+        }
+    }
+
+
+    public void printAllNextStates(){
             transitions.entrySet().stream().forEach((entry)->{
                 System.out.print( entry.getKey() + ": ");
                 for(State s :entry.getValue()){
@@ -67,11 +80,8 @@ public class lab1 {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         List<State> goodStates = new ArrayList<>();
-        List<State> allStates = new ArrayList<>();
         State beginState = null;
-        //String string = new String(Files.readAllBytes(Path.of("rjesenja.txt")));
-
-        // String line = reader.readLine();
+        State.allStates.add(new State("#"));
         try (FileWriter writer = new FileWriter("rjesenja.txt")) {
             String s = reader.readLine(); //Inputi1
             String[] str = s.split("\\|"); //Ako ima vise inputa preko |
@@ -131,10 +141,19 @@ public class lab1 {
                     }
 
                }
-//               for(State st: State.allStates){
-//                   System.out.println(st.getName());
-//                   st.printAllNextStates();
-//               }
+               for(State st: State.allStates){
+                   System.out.println(st.getName());
+                   st.printAllNextStates();
+               }
+
+
+                //checking empty states for begin state
+               List<State> tempRez = new ArrayList<>();
+            beginState.CheckForEmptyKey( tempRez);
+            System.out.println("Checking empty states");
+            for(State st: tempRez){
+               System.out.print(st.getName() + ", ");
+            }
             }
         }
     }
