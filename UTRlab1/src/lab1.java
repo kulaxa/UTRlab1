@@ -25,6 +25,7 @@ public class lab1 {
                     writer.append(line+"\n");
 
                 } catch (NumberFormatException e) {
+                    //dodajem komentar
                 }
             }
 
