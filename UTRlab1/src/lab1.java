@@ -14,13 +14,26 @@ class State{
         this.name = name;
         transitions = new HashMap<String, List<State>>();
     }
-
+    public Map<String, List<State>> getTransitions(){
+        return transitions;
+    }
     public String getName(){
         return name;
     }
 
     public List<State> getNextStates(String key){
         return transitions.get(key);
+    }
+    public void addNextSate(String key, String state){
+        if(!transitions.containsKey(key)){
+            List<State> temp = new ArrayList<>();
+            temp.add(getStateByName(state));
+            transitions.put(key, temp);
+        }
+        else{
+            transitions.get(key).add(getStateByName(state));
+        }
+
     }
 
     public static State getStateByName(String name){
@@ -32,6 +45,17 @@ class State{
             }
         }
        return null;
+    }
+
+        public void printAllNextStates(){
+            transitions.entrySet().stream().forEach((entry)->{
+                System.out.print( entry.getKey() + ": ");
+                for(State s :entry.getValue()){
+                    System.out.print(s.name + ", ");
+                }
+                System.out.println();
+            });
+
     }
 }
 
@@ -87,10 +111,30 @@ public class lab1 {
 
                 }
 
-                s = reader.readLine();
+                s = reader.readLine(); //begin state
                 beginState = State.getStateByName(s);
 
-                
+
+                //load everything else
+               while(true){
+                   String line = reader.readLine();
+                   if(line ==null) break;
+
+                   String[] splits = line.split("->");
+                    String[] starting = splits[0].split(",");
+                    String[] nextStates = splits[1].split(",");
+                    for(String st: nextStates){
+                        State.getStateByName(starting[0]).addNextSate(starting[1],st);
+                        //starting[0] -> state to change
+                        //starting[1] -> key to change state
+                        //nextStates -> list of states that change with that key
+                    }
+
+               }
+//               for(State st: State.allStates){
+//                   System.out.println(st.getName());
+//                   st.printAllNextStates();
+//               }
             }
         }
     }
