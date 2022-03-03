@@ -15,6 +15,17 @@ class State{
         order = currentOrder++;
         transitions = new HashMap<String, List<State>>();
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return ((State)obj).getName().equals(this.getName());
+    }
+
     public Map<String, List<State>> getTransitions(){
         return transitions;
     }
@@ -61,7 +72,9 @@ class State{
         if(state.getNextStates("$") ==null )return;
         result.addAll(state.getNextStates("$"));
         for(State s: state.getNextStates("$")){
-            CheckForEmptyKeyRec(s, result);
+            if(!state.getName().equals(s.getName())) {
+                CheckForEmptyKeyRec(s, result);
+            }
         }
     }
 
@@ -159,6 +172,19 @@ public class lab1 {
 
                 List<State> nextStepStates = new ArrayList<>();
                nextStepStates.add(beginState);
+               beginState.CheckForEmptyKey(nextStepStates);
+
+            Set<State> temptempSet = new LinkedHashSet<>();
+            nextStepStates.stream().forEach((state) -> {temptempSet.add((state));});
+            nextStepStates.clear();
+
+            temptempSet.stream().forEach((state)->nextStepStates.add(state));
+            nextStepStates.sort(new Comparator<State>() {
+                @Override
+                public int compare(State state, State t1) {
+                    return state.getOrder() - t1.getOrder();
+                }
+            });
                //prvo samo za prvi input
             List<State> tempList = new ArrayList<>();
             //System.out.println("MAIN ALGORITHM");
@@ -173,12 +199,8 @@ public class lab1 {
                             else{
                                // tempList.add(State.getStateByName("#"));
                             }
-                        //}
-                        //else{
-                         //   tempList.addAll(st.getNextStates(inp));
 
-                        //}
-
+                       st.CheckForEmptyKey(tempList);
                        Set<State> tempSet = new LinkedHashSet<>();
                        tempList.stream().forEach((state) -> {tempSet.add((state));});
                        tempList.clear();
@@ -190,7 +212,7 @@ public class lab1 {
                                return state.getOrder() - t1.getOrder();
                            }
                        });
-                       st.CheckForEmptyKey(tempList);
+
                        //System.out.print(" and getting: {");
 //                       tempList.stream().forEach(
 //                               (stri) -> {
@@ -203,14 +225,16 @@ public class lab1 {
                    boolean addedSomething=false;
                    for(int i=0; i<nextStepStates.size(); i++){
                        if(i+1 != nextStepStates.size()){
-
-                           builder.append(nextStepStates.get(i).getName()+",");
-                           addedSomething = true;
+                            if(!nextStepStates.get(i).getName().equals("#")) {
+                                builder.append(nextStepStates.get(i).getName() + ",");
+                                addedSomething = true;
+                            }
                        }
                        else{
-
-                           builder.append(nextStepStates.get(i).getName());
-                            addedSomething = true;
+                           if(!nextStepStates.get(i).getName().equals("#")) {
+                               builder.append(nextStepStates.get(i).getName());
+                               addedSomething = true;
+                           }
                        }
                    }
                    if(!addedSomething){
@@ -234,13 +258,17 @@ public class lab1 {
             for(int i=0; i<nextStepStates.size(); i++){
                 if(i+1 != nextStepStates.size()){
                     //System.out.print(nextStepStates.get(i).getName()+",");
-                    builder.append(nextStepStates.get(i).getName()+",");
-                    addedSomething = true;
+                    if(!nextStepStates.get(i).getName().equals("#")) {
+                        builder.append(nextStepStates.get(i).getName() + ",");
+                        addedSomething = true;
+                    }
                 }
                 else{
                    // System.out.print(nextStepStates.get(i).getName());
-                    builder.append(nextStepStates.get(i).getName());
-                    addedSomething = true;
+                    if(!nextStepStates.get(i).getName().equals("#")) {
+                        builder.append(nextStepStates.get(i).getName());
+                        addedSomething = true;
+                    }
                 }
             }
             if(!addedSomething){
