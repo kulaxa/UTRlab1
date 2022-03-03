@@ -65,29 +65,47 @@ class State{
 
 
     public void CheckForEmptyKey(List<State> result){
-         CheckForEmptyKeyRec(this, result);
+         CheckForEmptyKeyRec(this, result, new ArrayList<>());
     }
 
-    private void CheckForEmptyKeyRec(State state, List<State> result) {
+    private void CheckForEmptyKeyRec(State state, List<State> result, List<String> controlList) {
+
         if(state.getNextStates("$") ==null )return;
+        controlList.add(state.getName());
         result.addAll(state.getNextStates("$"));
         for(State s: state.getNextStates("$")){
             if(!state.getName().equals(s.getName())) {
-                CheckForEmptyKeyRec(s, result);
+                boolean visited = false;
+                for(String str: controlList){
+                    if(str.equals(s.getName())){
+                        visited = true;
+                    }
+                }
+                if(!visited)
+                CheckForEmptyKeyRec(s, result,controlList);
             }
         }
     }
 
     public void CheckForEmptyKey(Set<State> result){
-        CheckForEmptyKeyRec(this, result);
+        CheckForEmptyKeyRec(this, result, new ArrayList<>());
     }
 
-    private void CheckForEmptyKeyRec(State state, Set<State> result) {
+    private void CheckForEmptyKeyRec(State state, Set<State> result, List<String> controlList) {
+
         if(state.getNextStates("$") ==null )return;
         result.addAll(state.getNextStates("$"));
+        controlList.add(state.getName());
         for(State s: state.getNextStates("$")){
             if(!state.getName().equals(s.getName())) {
-                CheckForEmptyKeyRec(s, result);
+                boolean visited = false;
+                for(String str: controlList){
+                    if(str.equals(s.getName())){
+                        visited = true;
+                    }
+                }
+                if(!visited)
+                CheckForEmptyKeyRec(s, result, controlList);
             }
         }
     }
@@ -176,125 +194,125 @@ public class lab1 {
                     }
 
                }
-               for(State st: State.allStates){
-                   //System.out.println(st.getName());
-                   //st.printAllNextStates();
-               }
-                State testStanje = State.getStateByName("s1");
+
+
                 StringBuilder builder = new StringBuilder();
                //main algorithm
 
-                List<State> nextStepStates = new ArrayList<>();
-               nextStepStates.add(beginState);
-               beginState.CheckForEmptyKey(nextStepStates);
+                for(int index=0; index< inputs.size(); index++) {
+                    List<State> nextStepStates = new ArrayList<>();
 
-            Set<State> temptempSet = new LinkedHashSet<>();
-            nextStepStates.stream().forEach((state) -> {temptempSet.add((state));});
-            nextStepStates.clear();
+                    beginState.CheckForEmptyKey(nextStepStates);
+                    nextStepStates.add(beginState);
+                    Set<State> temptempSet = new LinkedHashSet<>();
+                    nextStepStates.stream().forEach((state) -> {
+                        temptempSet.add((state));
+                    });
+                    nextStepStates.clear();
 
-            temptempSet.stream().forEach((state)->nextStepStates.add(state));
-            nextStepStates.sort(new Comparator<State>() {
-                @Override
-                public int compare(State state, State t1) {
-                    return state.getOrder() - t1.getOrder();
-                }
-            });
-               //prvo samo za prvi input
-            List<State> tempList = new ArrayList<>();
-            //System.out.println("MAIN ALGORITHM");
-               for(String inp : inputs.get(0)){
-                   for(State st: nextStepStates){
-                     //` System.out.println("For state: "+st.getName()+ " trying inp: "+inp);
+                    temptempSet.stream().forEach((state) -> nextStepStates.add(state));
+                    nextStepStates.sort(new Comparator<State>() {
+                        @Override
+                        public int compare(State state, State t1) {
+                            return state.getOrder() - t1.getOrder();
+                        }
+                    });
+                    //prvo samo za prvi input
+                    List<State> tempList = new ArrayList<>();
+                    //System.out.println("MAIN ALGORITHM");
+                    for (String inp : inputs.get(index)) {
+                        for (State st : nextStepStates) {
+                            //` System.out.println("For state: "+st.getName()+ " trying inp: "+inp);
 
-                       // if(tempList.isEmpty()) {
-                            if(st.getNextStates(inp) !=null) {
+                            // if(tempList.isEmpty()) {
+                            if (st.getNextStates(inp) != null) {
                                 tempList.addAll(st.getNextStates(inp));
+                            } else {
+                                // tempList.add(State.getStateByName("#"));
                             }
-                            else{
-                               // tempList.add(State.getStateByName("#"));
-                            }
 
 
-
-                       //System.out.print(" and getting: {");
+                            //System.out.print(" and getting: {");
 //                       tempList.stream().forEach(
 //                               (stri) -> {
 //                                   System.out.print(stri.getName()+ ", ");
 //                               });
-                      // System.out.print("}");
-                      //System.out.println();
+                            // System.out.print("}");
+                            //System.out.println();
 
-                   }
-                   Set<State> tempSet = new LinkedHashSet<>();
-                   tempSet.addAll(tempList);
-                   for(State st: tempList) {
-                       st.CheckForEmptyKey(tempSet);
-                   }
-                   tempList.clear();
+                        }
+                        Set<State> tempSet = new LinkedHashSet<>();
+
+                        for (State st : tempList) {
+                            st.CheckForEmptyKey(tempSet);
+                        }
+                        tempSet.addAll(tempList);
+                        tempList.clear();
                         tempSet.stream().forEach((state) -> tempList.add(state));
-                       tempList.sort(new Comparator<State>() {
-                           @Override
-                           public int compare(State state, State t1) {
-                               return state.getOrder() - t1.getOrder();
-                           }
-                       });
+                        tempList.sort(new Comparator<State>() {
+                            @Override
+                            public int compare(State state, State t1) {
+                                return state.getOrder() - t1.getOrder();
+                            }
+                        });
 
-                   boolean addedSomething=false;
-                   for(int i=0; i<nextStepStates.size(); i++){
-                       if(i+1 != nextStepStates.size()){
-                            if(!nextStepStates.get(i).getName().equals("#")) {
+                        boolean addedSomething = false;
+                        for (int i = 0; i < nextStepStates.size(); i++) {
+                            if (i + 1 != nextStepStates.size()) {
+                                if (!nextStepStates.get(i).getName().equals("#")) {
+                                    builder.append(nextStepStates.get(i).getName() + ",");
+                                    addedSomething = true;
+                                }
+                            } else {
+                                if (!nextStepStates.get(i).getName().equals("#")) {
+                                    builder.append(nextStepStates.get(i).getName());
+                                    addedSomething = true;
+                                }
+                            }
+                        }
+                        if (!addedSomething) {
+                            builder.append("#");
+                        }
+
+                        //System.out.println("|");
+                        builder.append("|");
+                        nextStepStates.clear();
+                        //if(tempList.isEmpty()){
+                        //  System.out.println("List is empty for: "+inp);
+                        //}
+                        nextStepStates.addAll(tempList);
+
+
+                        tempList.clear();
+
+
+                    }
+                    boolean addedSomething = false;
+                    for (int i = 0; i < nextStepStates.size(); i++) {
+                        if (i + 1 != nextStepStates.size()) {
+                            //System.out.print(nextStepStates.get(i).getName()+",");
+                            if (!nextStepStates.get(i).getName().equals("#")) {
                                 builder.append(nextStepStates.get(i).getName() + ",");
                                 addedSomething = true;
                             }
-                       }
-                       else{
-                           if(!nextStepStates.get(i).getName().equals("#")) {
-                               builder.append(nextStepStates.get(i).getName());
-                               addedSomething = true;
-                           }
-                       }
-                   }
-                   if(!addedSomething){
-                       builder.append("#");
-                   }
-
-                   //System.out.println("|");
-                   builder.append("|");
-                   nextStepStates.clear();
-                   //if(tempList.isEmpty()){
-                     //  System.out.println("List is empty for: "+inp);
-                   //}
-                   nextStepStates.addAll(tempList);
-
-
-                   tempList.clear();
-
-
-               }
-            boolean addedSomething=false;
-            for(int i=0; i<nextStepStates.size(); i++){
-                if(i+1 != nextStepStates.size()){
-                    //System.out.print(nextStepStates.get(i).getName()+",");
-                    if(!nextStepStates.get(i).getName().equals("#")) {
-                        builder.append(nextStepStates.get(i).getName() + ",");
-                        addedSomething = true;
+                        } else {
+                            // System.out.print(nextStepStates.get(i).getName());
+                            if (!nextStepStates.get(i).getName().equals("#")) {
+                                builder.append(nextStepStates.get(i).getName());
+                                addedSomething = true;
+                            }
+                        }
                     }
-                }
-                else{
-                   // System.out.print(nextStepStates.get(i).getName());
-                    if(!nextStepStates.get(i).getName().equals("#")) {
-                        builder.append(nextStepStates.get(i).getName());
-                        addedSomething = true;
+                    if (!addedSomething) {
+                        builder.append("#");
                     }
-                }
-            }
-            if(!addedSomething){
-                builder.append("#");
-            }
-            builder.append("\n");
-            //System.out.println(builder.toString());
-            writer.append(builder.toString());
+                    //System.out.println("NEXT INPUT");
 
+                    builder.append("\n");
+                    //System.out.println(builder.toString());
+                    writer.append(builder.toString());
+                    builder = new StringBuilder();
+                }
 
                 //checking empty states for begin state
 //               List<State> tempRez = new ArrayList<>();
