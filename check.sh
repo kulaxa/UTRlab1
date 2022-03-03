@@ -10,7 +10,8 @@
 for dire in ./testovi/*
 do
 	echo  $dire
-	java -jar "/home/mario/Dropbox/Faks/UTR/Zadaće i labosi/lab1/UTRlab1.jar" < "$dire/test.a"
+	#java -jar "/home/mario/Dropbox/Faks/UTR/Zadaće i labosi/lab1/UTRlab1.jar" < "$dire/test.a"
+	java --class-path "/home/mario/Dropbox/Faks/UTR/Zadaće i labosi/UTRlab1/UTRlab1/src" lab1 < "$dire/test.a"
 	diff rjesenja.txt  "$dire/test.b"
 
 done

@@ -1,17 +1,18 @@
+import com.sun.nio.sctp.PeerAddressChangeNotification;
+
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class State{
     private String name;
     private Map<String, List<State>> transitions;
-
+    private int order;
+    private static int currentOrder=0;
     public static List<State> allStates = new ArrayList<>();
 
     public State(String name) {
         this.name = name;
+        order = currentOrder++;
         transitions = new HashMap<String, List<State>>();
     }
     public Map<String, List<State>> getTransitions(){
@@ -19,6 +20,9 @@ class State{
     }
     public String getName(){
         return name;
+    }
+    public int getOrder(){
+        return order;
     }
 
     public List<State> getNextStates(String key){
@@ -47,6 +51,8 @@ class State{
        return null;
     }
 
+
+
     public void CheckForEmptyKey(List<State> result){
          CheckForEmptyKeyRec(this, result);
     }
@@ -74,6 +80,8 @@ class State{
 
 
 public class lab1 {
+
+
 
 
     public static void main(String[] args) throws IOException {
@@ -142,18 +150,114 @@ public class lab1 {
 
                }
                for(State st: State.allStates){
-                   System.out.println(st.getName());
-                   st.printAllNextStates();
+                   //System.out.println(st.getName());
+                   //st.printAllNextStates();
                }
+                State testStanje = State.getStateByName("s1");
+                StringBuilder builder = new StringBuilder();
+               //main algorithm
+
+                List<State> nextStepStates = new ArrayList<>();
+               nextStepStates.add(beginState);
+               //prvo samo za prvi input
+            List<State> tempList = new ArrayList<>();
+            //System.out.println("MAIN ALGORITHM");
+               for(String inp : inputs.get(0)){
+                   for(State st: nextStepStates){
+                     //` System.out.println("For state: "+st.getName()+ " trying inp: "+inp);
+
+                       // if(tempList.isEmpty()) {
+                            if(st.getNextStates(inp) !=null) {
+                                tempList.addAll(st.getNextStates(inp));
+                            }
+                            else{
+                               // tempList.add(State.getStateByName("#"));
+                            }
+                        //}
+                        //else{
+                         //   tempList.addAll(st.getNextStates(inp));
+
+                        //}
+
+                       Set<State> tempSet = new LinkedHashSet<>();
+                       tempList.stream().forEach((state) -> {tempSet.add((state));});
+                       tempList.clear();
+
+                       tempSet.stream().forEach((state)->tempList.add(state));
+                       tempList.sort(new Comparator<State>() {
+                           @Override
+                           public int compare(State state, State t1) {
+                               return state.getOrder() - t1.getOrder();
+                           }
+                       });
+                       st.CheckForEmptyKey(tempList);
+                       //System.out.print(" and getting: {");
+//                       tempList.stream().forEach(
+//                               (stri) -> {
+//                                   System.out.print(stri.getName()+ ", ");
+//                               });
+                      // System.out.print("}");
+                      //System.out.println();
+
+                   }
+                   boolean addedSomething=false;
+                   for(int i=0; i<nextStepStates.size(); i++){
+                       if(i+1 != nextStepStates.size()){
+
+                           builder.append(nextStepStates.get(i).getName()+",");
+                           addedSomething = true;
+                       }
+                       else{
+
+                           builder.append(nextStepStates.get(i).getName());
+                            addedSomething = true;
+                       }
+                   }
+                   if(!addedSomething){
+                       builder.append("#");
+                   }
+
+                   //System.out.println("|");
+                   builder.append("|");
+                   nextStepStates.clear();
+                   //if(tempList.isEmpty()){
+                     //  System.out.println("List is empty for: "+inp);
+                   //}
+                   nextStepStates.addAll(tempList);
+
+
+                   tempList.clear();
+
+
+               }
+            boolean addedSomething=false;
+            for(int i=0; i<nextStepStates.size(); i++){
+                if(i+1 != nextStepStates.size()){
+                    //System.out.print(nextStepStates.get(i).getName()+",");
+                    builder.append(nextStepStates.get(i).getName()+",");
+                    addedSomething = true;
+                }
+                else{
+                   // System.out.print(nextStepStates.get(i).getName());
+                    builder.append(nextStepStates.get(i).getName());
+                    addedSomething = true;
+                }
+            }
+            if(!addedSomething){
+                builder.append("#");
+            }
+            builder.append("\n");
+            //System.out.println(builder.toString());
+            writer.append(builder.toString());
 
 
                 //checking empty states for begin state
-               List<State> tempRez = new ArrayList<>();
-            beginState.CheckForEmptyKey( tempRez);
-            System.out.println("Checking empty states");
-            for(State st: tempRez){
-               System.out.print(st.getName() + ", ");
-            }
+//               List<State> tempRez = new ArrayList<>();
+//            beginState.CheckForEmptyKey( tempRez);
+//            System.out.println("Checking empty states");
+//            for(State st: tempRez){
+//               System.out.print(st.getName() + ", ");
+//            }
             }
         }
     }
