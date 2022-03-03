@@ -1,9 +1,8 @@
-a,b,c,b,a,d
-s1,s2,s3,s4,s5,s6,s7
+d,a,a,b,c,a,c,a,b,b,a,b,a
+s1,s2,s3,s4,s5
 a,b,c,d
 s2,s5
 s1
-s1,$->s3,s6,s7
 s1,a->s1,s3
 s1,b->s5
 s1,c->s3

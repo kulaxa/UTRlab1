@@ -78,6 +78,20 @@ class State{
         }
     }
 
+    public void CheckForEmptyKey(Set<State> result){
+        CheckForEmptyKeyRec(this, result);
+    }
+
+    private void CheckForEmptyKeyRec(State state, Set<State> result) {
+        if(state.getNextStates("$") ==null )return;
+        result.addAll(state.getNextStates("$"));
+        for(State s: state.getNextStates("$")){
+            if(!state.getName().equals(s.getName())) {
+                CheckForEmptyKeyRec(s, result);
+            }
+        }
+    }
+
 
     public void printAllNextStates(){
             transitions.entrySet().stream().forEach((entry)->{
@@ -200,18 +214,7 @@ public class lab1 {
                                // tempList.add(State.getStateByName("#"));
                             }
 
-                       st.CheckForEmptyKey(tempList);
-                       Set<State> tempSet = new LinkedHashSet<>();
-                       tempList.stream().forEach((state) -> {tempSet.add((state));});
-                       tempList.clear();
 
-                       tempSet.stream().forEach((state)->tempList.add(state));
-                       tempList.sort(new Comparator<State>() {
-                           @Override
-                           public int compare(State state, State t1) {
-                               return state.getOrder() - t1.getOrder();
-                           }
-                       });
 
                        //System.out.print(" and getting: {");
 //                       tempList.stream().forEach(
@@ -222,6 +225,20 @@ public class lab1 {
                       //System.out.println();
 
                    }
+                   Set<State> tempSet = new LinkedHashSet<>();
+                   tempSet.addAll(tempList);
+                   for(State st: tempList) {
+                       st.CheckForEmptyKey(tempSet);
+                   }
+                   tempList.clear();
+                        tempSet.stream().forEach((state) -> tempList.add(state));
+                       tempList.sort(new Comparator<State>() {
+                           @Override
+                           public int compare(State state, State t1) {
+                               return state.getOrder() - t1.getOrder();
+                           }
+                       });
+
                    boolean addedSomething=false;
                    for(int i=0; i<nextStepStates.size(); i++){
                        if(i+1 != nextStepStates.size()){
