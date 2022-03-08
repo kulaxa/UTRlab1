@@ -25,14 +25,8 @@ class State implements  Comparable<State>{
         return transitions.get(key);
     }
     public void addNextSate(String key, String state){
-        if(!transitions.containsKey(key)){
-            Set<State> temp = new TreeSet<>();
-            temp.add(getStateByName(state));
-            transitions.put(key, temp);
-        }
-        else{
-            transitions.get(key).add(getStateByName(state));
-        }
+        Set<State> tempSet= transitions.computeIfAbsent(key,k-> new TreeSet<>());
+        tempSet.add(getStateByName(state));
     }
     public static State getStateByName(String name){
        for(State s : State.allStates){
@@ -50,7 +44,6 @@ class State implements  Comparable<State>{
         controlList.add(state.getName());
         result.addAll(state.getNextStates("$"));
         for(State s: state.getNextStates("$")){
-            if(!state.getName().equals(s.getName())) {
                 boolean visited = false;
                 for(String str: controlList){
                     if(str.equals(s.getName())){
@@ -59,7 +52,6 @@ class State implements  Comparable<State>{
                 }
                 if(!visited)
                 CheckForEmptyKeyRec(s, result,controlList);
-            }
         }
     }
     @Override
@@ -71,7 +63,6 @@ public class lab1 {
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         List<State> goodStates = new ArrayList<>();
-        State beginState = null;
         State.allStates.add(new State("#"));
             String s = reader.readLine(); //Inputi1
             String[] str = s.split("\\|"); //Ako ima vise inputa preko |
@@ -103,7 +94,7 @@ public class lab1 {
                     }
                 }
                 s = reader.readLine(); //begin state
-                beginState = State.getStateByName(s);
+                State beginState = State.getStateByName(s);
                while(true){
                    String line = reader.readLine();
                    if(line ==null) break;
@@ -162,9 +153,6 @@ public class lab1 {
             }
         }
     }
-
-    //mogu staviti da je koristim setove svugdi
-//mogu promjeniti funkcije rekurzivne mislim da imaju redudantan if
 //trebam promjeniti nazive dok učitvam podatke.
-//ipak su stanja leksikografski poredana, a ne po onom njihovom redu, jebiga.
+
 
