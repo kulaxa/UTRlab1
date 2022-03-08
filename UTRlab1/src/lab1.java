@@ -2,54 +2,38 @@
 import java.io.*;
 import java.util.*;
 
-class State{
+class State implements  Comparable<State>{
     private String name;
-    private Map<String, List<State>> transitions;
+    private Map<String, Set<State>> transitions;
     private int order;
-    private static int currentOrder=0;
-    public static List<State> allStates = new ArrayList<>();
+    public static Set<State> allStates = new TreeSet<>();
 
     public State(String name) {
         this.name = name;
-        order = currentOrder++;
-        transitions = new HashMap<String, List<State>>();
+        transitions = new HashMap<String, Set<State>>();
     }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
+   @Override
     public boolean equals(Object obj) {
         return ((State)obj).getName().equals(this.getName());
     }
 
-    public Map<String, List<State>> getTransitions(){
-        return transitions;
-    }
     public String getName(){
         return name;
     }
-    public int getOrder(){
-        return order;
-    }
 
-    public List<State> getNextStates(String key){
+    public Set<State> getNextStates(String key){
         return transitions.get(key);
     }
     public void addNextSate(String key, String state){
         if(!transitions.containsKey(key)){
-            List<State> temp = new ArrayList<>();
+            Set<State> temp = new TreeSet<>();
             temp.add(getStateByName(state));
             transitions.put(key, temp);
         }
         else{
             transitions.get(key).add(getStateByName(state));
         }
-
     }
-
     public static State getStateByName(String name){
        for(State s : State.allStates){
             if(s.getName().equals(name)){
@@ -78,7 +62,10 @@ class State{
             }
         }
     }
-
+    @Override
+    public int compareTo(State state) {
+        return this.getName().compareTo(state.getName());
+    }
 }
 public class lab1 {
     public static void main(String[] args) throws IOException {
@@ -86,7 +73,6 @@ public class lab1 {
         List<State> goodStates = new ArrayList<>();
         State beginState = null;
         State.allStates.add(new State("#"));
-        try (FileWriter writer = new FileWriter("rjesenja.txt")) {
             String s = reader.readLine(); //Inputi1
             String[] str = s.split("\\|"); //Ako ima vise inputa preko |
             List<List<String>> inputs = new ArrayList<List<String>>(); //VARIJABLA ZA PRVI RED - INPUTI
@@ -118,7 +104,6 @@ public class lab1 {
                 }
                 s = reader.readLine(); //begin state
                 beginState = State.getStateByName(s);
-                //load everything else
                while(true){
                    String line = reader.readLine();
                    if(line ==null) break;
@@ -127,96 +112,53 @@ public class lab1 {
                     String[] nextStates = splits[1].split(",");
                     for(String st: nextStates){
                         State.getStateByName(starting[0]).addNextSate(starting[1],st);
-                        //starting[0] -> state to change
-                        //starting[1] -> key to change state
-                        //nextStates -> list of states that change with that key
                     }
-
                }
                 StringBuilder builder = new StringBuilder();
-               //main algorithm
                 for(int index=0; index< inputs.size(); index++) {
-                    List<State> nextStepStates = new ArrayList<>();
+                    Set<State> nextStepStates = new TreeSet<>();
                     beginState.CheckForEmptyKey(nextStepStates);
                     nextStepStates.add(beginState);
-                    Set<State> temptempSet = new LinkedHashSet<>();
-                    nextStepStates.stream().forEach((state) -> {
-                        temptempSet.add((state));
-                    });
-                    nextStepStates.clear();
-                    temptempSet.stream().forEach((state) -> nextStepStates.add(state));
-                    nextStepStates.sort(new Comparator<State>() {
-                        @Override
-                        public int compare(State state, State t1) {
-                            return state.getOrder() - t1.getOrder();
-                        }
-                    });
-                    List<State> tempList = new ArrayList<>();
+                    Set<State> tempSet = new TreeSet<>();
                     for (String inp : inputs.get(index)) {
                         for (State st : nextStepStates) {
                             if (st.getNextStates(inp) != null) {
-                                tempList.addAll(st.getNextStates(inp));
+                                tempSet.addAll(st.getNextStates(inp));
                             } else {
                             }
                         }
-                        Set<State> tempSet = new LinkedHashSet<>();
-                        for (State st : tempList) {
-                            st.CheckForEmptyKey(tempSet);
+                        for (Object st : tempSet.toArray()) {
+                            ((State)st).CheckForEmptyKey(tempSet);
                         }
-                        tempSet.addAll(tempList);
-                        tempList.clear();
-                        tempSet.stream().forEach((state) -> tempList.add(state));
-                        tempList.sort(new Comparator<State>() {
-                            @Override
-                            public int compare(State state, State t1) {
-                                return state.getOrder() - t1.getOrder();
-                            }
-                        });
-                        boolean addedSomething = false;
-                        for (int i = 0; i < nextStepStates.size(); i++) {
-                            if (i + 1 != nextStepStates.size()) {
-                                if (!nextStepStates.get(i).getName().equals("#")) {
-                                    builder.append(nextStepStates.get(i).getName() + ",");
-                                    addedSomething = true;
-                                }
-                            } else {
-                                if (!nextStepStates.get(i).getName().equals("#")) {
-                                    builder.append(nextStepStates.get(i).getName());
-                                    addedSomething = true;
-                                }
-                            }
-                        }
-                        if (!addedSomething) {
-                            builder.append("#");
-                        }
-                        builder.append("|");
+                        writeToBuilder(nextStepStates, false,builder);
                         nextStepStates.clear();
-                        nextStepStates.addAll(tempList);
-                        tempList.clear();
+                        nextStepStates.addAll(tempSet);
+                        tempSet.clear();
                     }
-                    boolean addedSomething = false;
-                    for (int i = 0; i < nextStepStates.size(); i++) {
-                        if (i + 1 != nextStepStates.size()) {
-                            if (!nextStepStates.get(i).getName().equals("#")) {
-                                builder.append(nextStepStates.get(i).getName() + ",");
-                                addedSomething = true;
-                            }
-                        } else {
-                            if (!nextStepStates.get(i).getName().equals("#")) {
-                                builder.append(nextStepStates.get(i).getName());
-                                addedSomething = true;
-                            }
-                        }
-                    }
-                    if (!addedSomething) {
-                        builder.append("#");
-                    }
-                    builder.append("\n");
+                    writeToBuilder(nextStepStates, true, builder);
                     System.out.print(builder.toString());
-                   writer.append(builder.toString());
                     builder = new StringBuilder();
                 }
-
+        }
+        public static void writeToBuilder(Set<State> nextStatesSet, boolean lastCall, StringBuilder builder){
+            boolean addedSomething = false;
+            for (int i = 0; i < nextStatesSet.size(); i++) {
+                if (!((State)nextStatesSet.toArray()[i]).getName().equals("#")) {
+                    builder.append(((State)nextStatesSet.toArray()[i]).getName());
+                    if(i != nextStatesSet.size()-1) {
+                        builder.append(",");
+                    }
+                    addedSomething = true;
+                }
+            }
+            if (!addedSomething) {
+                builder.append("#");
+            }
+            if(!lastCall) {
+                builder.append("|");
+            }
+            else{
+                builder.append("\n");
             }
         }
     }
