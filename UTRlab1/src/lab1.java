@@ -212,7 +212,8 @@ public class lab1 {
                         builder.append("#");
                     }
                     builder.append("\n");
-                    writer.append(builder.toString());
+                    System.out.print(builder.toString());
+                   writer.append(builder.toString());
                     builder = new StringBuilder();
                 }
 
