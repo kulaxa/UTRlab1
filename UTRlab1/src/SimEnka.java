@@ -17,6 +17,11 @@ class State implements Comparable<State> {
         return ((State) obj).getName().equals(this.getName());
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
     public String getName() {
         return name;
     }
@@ -65,42 +70,42 @@ class State implements Comparable<State> {
     }
 }
 
-public class lab1 {
+public class SimEnka {
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         List<State> goodStates = new ArrayList<>();
         State.allStates.add(new State("#"));
-        String s = reader.readLine(); //Inputi1
-        String[] str = s.split("\\|"); //Ako ima vise inputa preko |
-        List<List<String>> inputs = new ArrayList<List<String>>(); //VARIJABLA ZA PRVI RED - INPUTI
-        for (int i = 0; i < str.length; i++) {
-            inputs.add(new ArrayList<String>());
-            String[] temp = str[i].split(",");
+        String novaLinija = reader.readLine();
+        String[] splitsLinija = novaLinija.split("\\|");
+        List<List<String>> prvalinija = new ArrayList<List<String>>();
+        for (int i = 0; i < splitsLinija.length; i++) {
+            prvalinija.add(new ArrayList<String>());
+            String[] temp = splitsLinija[i].split(",");
             for (String el : temp) {
                 el.strip();
-                inputs.get(i).add(el);
+                prvalinija.get(i).add(el);
             }
         }
-        s = reader.readLine(); //Stanja
-        str = s.split(",");
-        for (String el : str) {
+        novaLinija = reader.readLine(); //Stanja
+        splitsLinija = novaLinija.split(",");
+        for (String el : splitsLinija) {
             State.allStates.add(new State(el));
         }
-        s = reader.readLine(); //Abeceda
-        List<String> abeceda = new ArrayList<>();
-        str = s.split(",");
+        novaLinija = reader.readLine(); //Abeceda
+        List<String> svaSlova = new ArrayList<>();
+        splitsLinija = novaLinija.split(",");
 
-        for (String el : str) {
-            abeceda.add(el);
+        for (String el : splitsLinija) {
+            svaSlova.add(el);
         }
-        s = reader.readLine(); //poželjna stanja
-        for (String el : s.split(",")) {
+        novaLinija = reader.readLine(); //pozeljna stanja
+        for (String el : novaLinija.split(",")) {
             if (State.getStateByName(el) != null) {
                 goodStates.add(State.getStateByName(el));
             }
         }
-        s = reader.readLine(); //begin state
-        State beginState = State.getStateByName(s);
+        novaLinija = reader.readLine(); //begin state
+        State beginState = State.getStateByName(novaLinija);
         while (true) {
             String line = reader.readLine();
             if (line == null) break;
@@ -112,12 +117,12 @@ public class lab1 {
             }
         }
         StringBuilder builder = new StringBuilder();
-        for (int index = 0; index < inputs.size(); index++) {
+        for (int index = 0; index < prvalinija.size(); index++) {
             Set<State> nextStepStates = new TreeSet<>();
             beginState.CheckForEmptyKey(nextStepStates);
             nextStepStates.add(beginState);
             Set<State> tempSet = new TreeSet<>();
-            for (String inp : inputs.get(index)) {
+            for (String inp : prvalinija.get(index)) {
                 for (State st : nextStepStates) {
                     if (st.getNextStates(inp) != null) {
                         tempSet.addAll(st.getNextStates(inp));
@@ -159,6 +164,6 @@ public class lab1 {
         }
     }
 }
-//trebam promjeniti nazive dok učitvam podatke.
+//trebam promjeniti nazive dok ucitvam podatke.
 
 
